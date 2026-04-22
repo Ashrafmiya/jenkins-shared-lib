@@ -4,53 +4,67 @@ class Deployment implements Serializable {
 
     def steps
 
+    // 🔒 Centralized Config INSIDE class (as requested)
+    def REPO_URL = "https://github.com/opstree/OT-Microservices.git"
+    def BRANCH   = "master"
+
     Deployment(steps) {
         this.steps = steps
     }
 
     // ✅ Validate Environment
     def validate(String env) {
-        steps.echo "Validating deployment for ${env}..."
+        steps.echo "🔍 Validating environment: ${env}"
 
         if (!(env in ['dev', 'staging', 'prod'])) {
-            steps.error("Invalid environment: ${env}")
+            steps.error("❌ Invalid environment: ${env}")
         }
 
-        steps.sh "echo Validation successful for ${env}"
+        steps.echo "✅ Validation successful for ${env}"
     }
 
     // 🚀 Deploy Application
     def deploy(String env) {
-        steps.echo "Deploying application to ${env}..."
+        steps.echo "🚀 Starting deployment"
+        steps.echo "Environment : ${env}"
+        steps.echo "Repository  : ${REPO_URL}"
+        steps.echo "Branch      : ${BRANCH}"
 
-        // Clean workspace (best practice)
+        // Clean workspace
         steps.cleanWs()
 
-        // Clone repo using Jenkins git step
-        steps.git url: 'https://github.com/opstree/OT-Microservices.git', branch: 'master'
+        // Use directory block (BEST PRACTICE)
+        steps.dir("app") {
 
-        // Deployment logic (customize as needed)
-        steps.sh """
-            cd OT-Microservices
-            echo "Starting deployment for ${env} environment..."
+            // Clone repo
+            steps.git url: REPO_URL, branch: BRANCH
 
-            # Example commands
-            echo "Building application..."
-            echo "Deploying services..."
+            steps.sh """
+                echo "📂 Current Directory:"
+                pwd
 
-            # Simulate success
-            echo "Deployment successful for ${env}"
-        """
+                echo "📁 Project Files:"
+                ls -la
+
+                echo "⚙️ Building application..."
+                # Example: docker build / mvn build / npm install
+
+                echo "🚀 Deploying application to ${env}..."
+                # Example: docker-compose up -d
+
+                echo "✅ Deployment successful for ${env}"
+            """
+        }
     }
 
-    // 🔄 Rollback
+    // 🔄 Rollback Logic
     def rollback(String env) {
-        steps.echo "Rolling back deployment for ${env}..."
+        steps.echo "⚠️ Deployment failed! Starting rollback for ${env}"
 
         steps.sh """
-            echo "Rollback started for ${env}..."
-            echo "Reverting to previous stable version..."
-            echo "Rollback completed for ${env}"
+            echo "🔄 Rolling back ${env} environment..."
+            echo "Reverting to last stable version..."
+            echo "✅ Rollback completed for ${env}"
         """
     }
 }

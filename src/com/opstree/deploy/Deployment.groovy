@@ -8,7 +8,7 @@ class Deployment implements Serializable {
         this.steps = steps
     }
 
-    // ✅ Validation
+    // ✅ Validate Environment
     def validate(String env) {
         steps.echo "Validating deployment for ${env}..."
 
@@ -19,23 +19,27 @@ class Deployment implements Serializable {
         steps.sh "echo Validation successful for ${env}"
     }
 
-    // 🚀 Deployment
+    // 🚀 Deploy Application
     def deploy(String env) {
         steps.echo "Deploying application to ${env}..."
 
-        if (env == "dev") {
-            steps.sh "echo Deploying to DEV environment"
-        } else if (env == "staging") {
-            steps.sh "echo Deploying to STAGING environment"
-        } else if (env == "prod") {
-            steps.sh "echo Deploying to PRODUCTION environment"
-        }
+        // Clean workspace (best practice)
+        steps.cleanWs()
 
-        // Example using your repo
+        // Clone repo using Jenkins git step
+        steps.git url: 'https://github.com/opstree/OT-Microservices.git', branch: 'main'
+
+        // Deployment logic (customize as needed)
         steps.sh """
-            git clone https://github.com/opstree/OT-Microservices.git
             cd OT-Microservices
-            echo "Running deployment scripts..."
+            echo "Starting deployment for ${env} environment..."
+
+            # Example commands
+            echo "Building application..."
+            echo "Deploying services..."
+
+            # Simulate success
+            echo "Deployment successful for ${env}"
         """
     }
 
@@ -43,6 +47,10 @@ class Deployment implements Serializable {
     def rollback(String env) {
         steps.echo "Rolling back deployment for ${env}..."
 
-        steps.sh "echo Rollback executed for ${env}"
+        steps.sh """
+            echo "Rollback started for ${env}..."
+            echo "Reverting to previous stable version..."
+            echo "Rollback completed for ${env}"
+        """
     }
 }

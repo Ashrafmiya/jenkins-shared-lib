@@ -27,7 +27,7 @@ class Deployment implements Serializable {
         steps.cleanWs()
 
         // Clone repo using Jenkins git step
-        steps.git url: 'https://github.com/opstree/OT-Microservices.git', branch: 'main'
+        steps.git url: 'https://github.com/opstree/OT-Microservices.git', branch: 'master'
 
         // Deployment logic (customize as needed)
         steps.sh """
